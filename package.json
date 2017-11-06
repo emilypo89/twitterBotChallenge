@@ -1,0 +1,22 @@
+{
+  "name": "twitterbotchallange",
+  "version": "1.0.0",
+  "description": "Twitter Bot Coding Challenge",
+  "main": "twitterBot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emilypo89/twitterBotChallange.git"
+  },
+  "author": "edp",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/emilypo89/twitterBotChallange/issues"
+  },
+  "homepage": "https://github.com/emilypo89/twitterBotChallange#readme",
+  "dependencies": {
+    "twitter": "^1.7.1"
+  }
+}

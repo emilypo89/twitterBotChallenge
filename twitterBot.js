@@ -24,9 +24,9 @@ function replyWithGif() {
 
 
 
-// function to add a tweet
-function replyTweet(replyUser) {
-	client.post('statuses/update', {status: "Hi @" + replyUser + " !"}, function(error, tweet, response) {
+// function to add a tweet in reply to the initial tweet
+function replyTweet(replyUser, searchTerm) {
+	client.post('statuses/update', {status: "@" + replyUser + " " + searchTerm}, function(error, tweet, response) {
   if (!error) {
     console.log(tweet);
   }
@@ -37,9 +37,18 @@ function replyTweet(replyUser) {
 // Stream to listen for new tweets that state "@giphyTweetBot"
 client.stream('statuses/filter', {track: '@giphyTweetBot'}, function(stream) {
   stream.on('data', function(tweet) {
-  	console.log(tweet);
+  	// console.log(tweet);
     console.log(tweet.text);
-    replyTweet(tweet.user.screen_name);
+    var tweet = tweet.text;
+    var splitTweet = tweet.split(" ");
+    // console.log(splitTweet);
+    var index = splitTweet.indexOf("@giphyTweetBot");
+    console.log(index);
+    splitTweet.splice(index, 1);
+    console.log(splitTweet);
+    var searchTerm = splitTweet.join("+");
+    console.log(searchTerm);
+    // replyTweet(tweet.user.screen_name, searchTerm);
   });
 
   stream.on('error', function(error) {
@@ -48,7 +57,3 @@ client.stream('statuses/filter', {track: '@giphyTweetBot'}, function(stream) {
 });
 
 
-// client.get('search/tweets', {q: 'giphyTweetBot'}, function(error, tweets, response) {
-//    console.log(tweets);
-
-// });

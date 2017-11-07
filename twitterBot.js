@@ -1,5 +1,10 @@
+// Dependencies
 var $ = require('jquery');
+var express = require('express');
+var app = express();
 var Twitter = require('twitter');
+var axios = require('axios');
+// keys to access twitter account
 var twitterKeys = require("./keys.js");
 var client = new Twitter({
 	consumer_key: twitterKeys.twitterKeys.consumer_key,
@@ -8,32 +13,15 @@ var client = new Twitter({
 	access_token_secret: twitterKeys.twitterKeys.access_token_secret
 });
 
-var keyword = "liz+lemon"
-var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + keyword + "&limit=1&api_key=dc6zaTOxFJmzC";
-
-function replyWithGif() {
-  $.ajax({
-    url: queryURL,
-    method: "GET"
-  }).done(function(response) { 
-    console.log(response);
-  });
-}
-
-// replyWithGif();
-
-
-
 // function to add a tweet in reply to the initial tweet
-function replyTweet(replyUser, searchTerm) {
-	client.post('statuses/update', {status: "@" + replyUser + " " + searchTerm}, function(error, tweet, response) {
-  if (!error) {
-    console.log(tweet);
-  }
-});
+function replyTweet(replyUser, searchTermURL) {
+	client.post('statuses/update', {status: "@" + replyUser + " " + searchTermURL}, function(error, tweet, response) {
+	  if (!error) {
+	    console.log(tweet);
+	  }
+	});
 }
  
-
 // Stream to listen for new tweets that state "@giphyTweetBot"
 client.stream('statuses/filter', {track: '@giphyTweetBot'}, function(stream) {
 	// listening for new tweet
@@ -42,21 +30,32 @@ client.stream('statuses/filter', {track: '@giphyTweetBot'}, function(stream) {
     console.log(tweet.text);
     // splitting the tweet into an array
     var splitTweet = tweet.text.split(" ");
-    // // finding the index of "@giphyTweetBot" within the array
+    // finding the index of "@giphyTweetBot" within the array
     var index = splitTweet.indexOf("@giphyTweetBot");
-    // // removing it from the array 
+    // removing it from the array 
     splitTweet.splice(index, 1);
     console.log(splitTweet);
-    // // joining the remaining terms with + inbetween for giphyAPI search
+    // joining the remaining terms with + inbetween for giphyAPI search
     var searchTerm = splitTweet.join("+");
     console.log(searchTerm);
-    // replying to the tweet with the searchTerm 
-    replyTweet(tweet.user.screen_name, searchTerm);
+    // axios get request to the giphy API to search for the search term the user tweeted
+    axios({
+			method: 'get',
+			url: "http://api.giphy.com/v1/gifs/search?q=" + searchTerm + "&limit=1&api_key=dc6zaTOxFJmzC"
+		}).then(function(response) {
+			console.log(response.data.data[0].url);
+			// replying to the tweet with the url for the gif
+    	replyTweet(tweet.user.screen_name, response.data.data[0].url);
+		});
   });
-
+  // if error console log error
   stream.on('error', function(error) {
     console.log(error);
   });
 });
 
+// app listening on port
+app.listen(3000, function () {
+  console.log('app listening on port 3000!');
+});
 

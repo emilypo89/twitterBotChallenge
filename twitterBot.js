@@ -36,19 +36,22 @@ function replyTweet(replyUser, searchTerm) {
 
 // Stream to listen for new tweets that state "@giphyTweetBot"
 client.stream('statuses/filter', {track: '@giphyTweetBot'}, function(stream) {
+	// listening for new tweet
   stream.on('data', function(tweet) {
-  	// console.log(tweet);
+  	// text of the new tweet
     console.log(tweet.text);
-    var tweet = tweet.text;
-    var splitTweet = tweet.split(" ");
-    // console.log(splitTweet);
+    // splitting the tweet into an array
+    var splitTweet = tweet.text.split(" ");
+    // // finding the index of "@giphyTweetBot" within the array
     var index = splitTweet.indexOf("@giphyTweetBot");
-    console.log(index);
+    // // removing it from the array 
     splitTweet.splice(index, 1);
     console.log(splitTweet);
+    // // joining the remaining terms with + inbetween for giphyAPI search
     var searchTerm = splitTweet.join("+");
     console.log(searchTerm);
-    // replyTweet(tweet.user.screen_name, searchTerm);
+    // replying to the tweet with the searchTerm 
+    replyTweet(tweet.user.screen_name, searchTerm);
   });
 
   stream.on('error', function(error) {
